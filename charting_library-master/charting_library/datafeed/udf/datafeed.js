@@ -362,8 +362,11 @@ Datafeeds.UDFCompatibleDatafeed.prototype.getBars = function(symbolInfo, resolut
 			if (volumePresent) {
 				barValue.volume = data.v[i];
 			}
+			console.log('最终转换成需要的数据结构')
 			console.log(barValue)
 			bars.push(barValue);
+			console.log('最终拿来传给tradingview的数据')
+			console.log(bars)
 		}
 
 		onDataCallback(bars, { noData: nodata, nextTime: data.nb || data.nextTime });

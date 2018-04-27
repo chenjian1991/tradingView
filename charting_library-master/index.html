@@ -46,9 +46,10 @@
 					datafeed: new Datafeeds.UDFCompatibleDatafeed("https://demo_feed.tradingview.com"),
 					library_path: "charting_library/",
 					locale: getParameterByName('lang') || "en",
+					 allow_symbol_change: true,
 					//	Regression Trend-related functionality is not implemented yet, so it's hidden for a while
 					drawings_access: { type: 'black', tools: [ { name: "Regression Trend" } ] },
-					disabled_features: ["use_localstorage_for_settings","volume_force_overlay","header_compare","header_symbol_search","header_resolutions","header_undo_redo","header_indicators","header_chart_tpye","header_screenshot","header_chart_type","timeframes_toolbar",],
+					disabled_features: ["use_localstorage_for_settings","volume_force_overlay","header_compare","header_symbol_search","header_resolutions","header_undo_redo","header_indicators","header_chart_tpye","header_screenshot","header_chart_type","timeframes_toolbar","display_market_stauts"],
 					enabled_features: ["study_templates","move_logo_to_main_pane"],
 					//charts_storage_url: 'http://saveload.tradingview.com',
                     charts_storage_api_version: "1.1",
@@ -63,11 +64,11 @@
                     "mainSeriesProperties.barStyle.barColorsOnPrevClose": false,
                     "mainSeriesProperties.barStyle.dontDrawOpen": false,
                     "volumePaneSize": "medium",//成交量大小的显示
-                    //背景色，蜡烛颜色
                     /*"paneProperties.background": "#ffffff",
 					"paneProperties.vertGridProperties.color": "#E6E6E6",
 					"paneProperties.horzGridProperties.color": "#E6E6E6",
 					"paneProperties.crossHairProperties.color": "#989898",*/
+					//背景色，蜡烛颜色
 					"paneProperties.background": "#1a2330",
 		            "paneProperties.vertGridProperties.color": "#454545",
 		            "paneProperties.vertGridProperties.style": 0,
@@ -89,17 +90,9 @@
 						},
 
                 	},
-                	custom_css_url :"./myself.css"
-					/*widgetbar: {
-						details: true,
-						watchlist: true,
-						watchlist_settings: {
-							default_symbols: ["NYSE:AA", "NYSE:AAL", "NASDAQ:AAPL"],
-							readonly: false
-						}
-					}*/
+                	custom_css_url :"./myself.css",
 				});
-
+				//分时的样式
 				widget.onChartReady(function() {
                 var resolution = [
                     {"text":'1min', "resolution":'1'},
@@ -121,10 +114,12 @@
                         })
                 }
 
+                widget.chart().createStudy("MA Cross", true, true, [10, 30]); 
+
             });
 
 
-			widget.chart().createStudy("MA Cross", true, true, [10, 30]); 
+			
 
 			});
 
