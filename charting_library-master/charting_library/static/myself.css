@@ -2,3 +2,5 @@
 	margin:0;
 	padding:0;
 }
+.header-chart-panel .left .group .space-single .button.iconed, .header-chart-panel .button.iconed{background: #2c3b59;color: #c7cce6; }
+.header-chart-panel .group .button{background: #2c3b59;color: #c7cce6; }

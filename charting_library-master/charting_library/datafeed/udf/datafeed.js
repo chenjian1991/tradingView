@@ -315,7 +315,7 @@ Datafeeds.UDFCompatibleDatafeed.prototype.getBars = function(symbolInfo, resolut
 	if (rangeStartDate > 0 && (rangeStartDate + '').length > 10) {
 		throw new Error(['Got a JS time instead of Unix one.', rangeStartDate, rangeEndDate]);
 	}
-	console.log(this)
+	//console.log(this)
 	//请求后端数据,url,params
 	this._send(this._datafeedURL + this._historyURL, {
 		symbol: symbolInfo.ticker.toUpperCase(),
@@ -325,7 +325,7 @@ Datafeeds.UDFCompatibleDatafeed.prototype.getBars = function(symbolInfo, resolut
 	})
 	.done(function(response) {
 		var data = JSON.parse(response);
-		console.log(data)
+		//console.log(data)
 		var nodata = data.s === 'no_data';
 		if (data.s !== 'ok' && !nodata) {
 			if (!!onErrorCallback) {
@@ -343,8 +343,8 @@ Datafeeds.UDFCompatibleDatafeed.prototype.getBars = function(symbolInfo, resolut
 
 		var volumePresent = typeof data.v != 'undefined'; //ture or false
 		var ohlPresent = typeof data.o != 'undefined';//true or false
-		console.log(barsCount)
-		console.log(ohlPresent)
+		//console.log(barsCount)
+		//console.log(ohlPresent)
 		for (var i = 0; i < barsCount; ++i) {
 			var barValue = {
 				time: data.t[i] * 1000,
@@ -362,11 +362,11 @@ Datafeeds.UDFCompatibleDatafeed.prototype.getBars = function(symbolInfo, resolut
 			if (volumePresent) {
 				barValue.volume = data.v[i];
 			}
-			console.log('最终转换成需要的数据结构')
-			console.log(barValue)
+			//console.log('最终转换成需要的数据结构')
+			//console.log(barValue)
 			bars.push(barValue);
-			console.log('最终拿来传给tradingview的数据')
-			console.log(bars)
+			//console.log('最终拿来传给tradingview的数据')
+			//console.log(bars)
 		}
 
 		onDataCallback(bars, { noData: nodata, nextTime: data.nb || data.nextTime });

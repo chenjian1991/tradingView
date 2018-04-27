@@ -64,10 +64,7 @@
                     "mainSeriesProperties.barStyle.barColorsOnPrevClose": false,
                     "mainSeriesProperties.barStyle.dontDrawOpen": false,
                     "volumePaneSize": "medium",//成交量大小的显示
-                    /*"paneProperties.background": "#ffffff",
-					"paneProperties.vertGridProperties.color": "#E6E6E6",
-					"paneProperties.horzGridProperties.color": "#E6E6E6",
-					"paneProperties.crossHairProperties.color": "#989898",*/
+                    
 					//背景色，蜡烛颜色
 					"paneProperties.background": "#1a2330",
 		            "paneProperties.vertGridProperties.color": "#454545",
@@ -76,6 +73,20 @@
 		            "paneProperties.horzGridProperties.style": 0,
 		            "symbolWatermarkProperties.transparency": 90,
 		            "scalesProperties.textColor" : "#AAA",
+		            "paneProperties.topMargin": 5,
+					"paneProperties.bottomMargin": 5,
+					//蜡烛的样式
+					"mainSeriesProperties.candleStyle.upColor": "#589065",
+					"mainSeriesProperties.candleStyle.downColor": "#ae4e54",
+					"mainSeriesProperties.candleStyle.drawWick": true,
+					"mainSeriesProperties.candleStyle.drawBorder": true,
+					"mainSeriesProperties.candleStyle.borderColor": "#589065",
+					"mainSeriesProperties.candleStyle.borderUpColor": "#589065",
+					"mainSeriesProperties.candleStyle.borderDownColor": "#ae4e54",
+					/*"mainSeriesProperties.candleStyle.wickUpColor": 'rgba( 115, 115, 117, 1)',
+					"mainSeriesProperties.candleStyle.wickDownColor": 'rgba( 115, 115, 117, 1)',
+					"mainSeriesProperties.candleStyle.barColorsOnPrevClose": false,
+*/
 		            linetoolicon: {
 						   " singleChartOnly": true,
 						    "color": 'rgba( 61, 133, 198, 1)',
@@ -114,7 +125,7 @@
                         })
                 }
 
-                widget.chart().createStudy("MA Cross", true, true, [10, 30]); 
+                widget.chart().createStudy("MA Cross", true, true, [10, 30]);
 
             });
 
