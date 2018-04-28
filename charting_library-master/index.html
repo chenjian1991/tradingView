@@ -124,8 +124,10 @@
                             console.log(this)
                         })
                 }
-
-                widget.chart().createStudy("MA Cross", true, true, [10, 30]);
+					var length_arr = [5, 10, 30,60];
+					length_arr.forEach(function(val, index){
+						widget.chart().createStudy('Moving Average', false, false, [val]);
+					})
 
             });
 

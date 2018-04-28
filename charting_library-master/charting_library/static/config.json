@@ -1,0 +1,28 @@
+{
+    "supports_search": true,
+    "supports_group_request": false,
+    "supports_marks": true,
+    "exchanges": [
+        {"value": "", "name": "All Exchanges", "desc": ""},
+        {"value": "XETRA", "name": "XETRA", "desc": "XETRA"},
+        {"value": "NSE", "name": "NSE", "desc": "NSE"}
+    ],
+    "symbolsTypes": [
+        {"name": "All types", "value": ""},
+        {"name": "Stock", "value": "stock"},
+        {"name": "Index", "value": "index"}
+    ],
+    "supported_resolutions": [
+        "1", 
+        "15", 
+        "30", 
+        "60", 
+        "D", 
+        "2D", 
+        "3D", 
+        "W", 
+        "3W", 
+        "M", 
+        "6M"
+    ]
+}
