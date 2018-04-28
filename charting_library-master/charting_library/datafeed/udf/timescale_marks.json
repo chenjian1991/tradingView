@@ -1,0 +1,49 @@
+[
+    {
+        "id": "tsm1",
+        "time": 1513296000,
+        "color": "red",
+        "label": "A",
+        "tooltip": ""
+    },
+    {
+        "id": "tsm2",
+        "time": 1512950400,
+        "color": "blue",
+        "label": "D",
+        "tooltip": [
+            "Dividends: $0.56",
+            "Date: Mon Dec 11 2017"
+        ]
+    },
+    {
+        "id": "tsm3",
+        "time": 1512691200,
+        "color": "green",
+        "label": "D",
+        "tooltip": [
+            "Dividends: $3.46",
+            "Date: Fri Dec 08 2017"
+        ]
+    },
+    {
+        "id": "tsm4",
+        "time": 1512000000,
+        "color": "#999999",
+        "label": "E",
+        "tooltip": [
+            "Earnings: $3.44",
+            "Estimate: $3.60"
+        ]
+    },
+    {
+        "id": "tsm7",
+        "time": 1510704000,
+        "color": "red",
+        "label": "E",
+        "tooltip": [
+            "Earnings: $5.40",
+            "Estimate: $5.00"
+        ]
+    }
+]
