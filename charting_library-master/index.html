@@ -8,17 +8,7 @@
 		<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0">
 		<meta http-equiv="X-UA-Compatible" content="IE=Edge">
 		<style type="text/css">
-			.chart-page .tv-side-toolbar .group, .chart-page .header-chart-panel .group {
-            float: left;
-        }
-        .chart-page .header-chart-panel .header-group-indicators, 
-        .chart-page .header-chart-panel .header-group-properties, 
-        .chart-page .header-chart-panel .header-group-bars-style {
-            float: none;
-        }
-        .chart-page .header-chart-panel .header-group-fullscreen{
-            float: right ;
-        }
+			
 		</style>
 		<!-- jQuery is not required to use Charting Library. It is used only for sample datafeed ajax requests. -->
 		<script type="text/javascript" src="charting_library/jquery-3.2.1.js"></script>
@@ -46,12 +36,11 @@
 					datafeed: new Datafeeds.UDFCompatibleDatafeed("https://demo_feed.tradingview.com"),
 					library_path: "charting_library/",
 					locale: getParameterByName('lang') || "en",
-					 allow_symbol_change: true,
+					allow_symbol_change: true,
 					//	Regression Trend-related functionality is not implemented yet, so it's hidden for a while
 					drawings_access: { type: 'black', tools: [ { name: "Regression Trend" } ] },
-					disabled_features: ["use_localstorage_for_settings","volume_force_overlay","header_compare","header_symbol_search","header_resolutions","header_undo_redo","header_indicators","header_chart_tpye","header_screenshot","header_chart_type","timeframes_toolbar","display_market_stauts"],
+					disabled_features: ["use_localstorage_for_settings","volume_force_overlay","header_compare","header_symbol_search","header_resolutions","header_undo_redo","header_indicators","header_chart_tpye","header_screenshot","header_chart_type","timeframes_toolbar","display_market_stauts",""],
 					enabled_features: ["study_templates","move_logo_to_main_pane"],
-					//charts_storage_url: 'http://saveload.tradingview.com',
                     charts_storage_api_version: "1.1",
 					client_id: 'tradingview.com',
 					loading_screen: { backgroundColor: "#fff" },
