@@ -6,4 +6,6 @@
 .header-chart-panel .group .button{background: #2c3b59;color: #c7cce6; }
 #library-container .header-chart-panel .left .header-group-properties{float: right;}
 #library-container .header-chart-panel .left .header-group-fullscreen{float: right;}
+.favored-list-container.study-template-widget .submenu{display: none;}
+.header-group-indicators{float: right;}
 /*#library-container .header-chart-panel{background-color: #2c3b59;}*/
