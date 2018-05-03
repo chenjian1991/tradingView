@@ -259,7 +259,6 @@ Datafeeds.UDFCompatibleDatafeed.prototype._symbolResolveURL = '/spot/util/symbol
 //	BEWARE: this function does not consider symbol's exchange
 Datafeeds.UDFCompatibleDatafeed.prototype.resolveSymbol = function(symbolName, onSymbolResolvedCallback, onResolveErrorCallback) {
 	var that = this;
-
 	if (!this._initializationFinished) {
 		this.on('initialized', function() {
 			that.resolveSymbol(symbolName, onSymbolResolvedCallback, onResolveErrorCallback);
@@ -267,31 +266,57 @@ Datafeeds.UDFCompatibleDatafeed.prototype.resolveSymbol = function(symbolName, o
 
 		return;
 	}
-
 	var resolveRequestStartTime = Date.now();
 	that._logMessage('Resolve requested');
-
 	function onResultReady(data) {
 		var postProcessedData = data;
 		if (that.postProcessSymbolInfo) {
 			postProcessedData = that.postProcessSymbolInfo(postProcessedData);
 		}
-
 		that._logMessage('Symbol resolved: ' + (Date.now() - resolveRequestStartTime));
-
 		onSymbolResolvedCallback(postProcessedData);
 	}
-
 	if (!this._configuration.supports_group_request) {
-		this._send("http://test-api.dev.bgaex.com:8080/spot/util/symbol.list", {
-			symbol: symbolName ? symbolName.toUpperCase() : ''
+		this._send(this._datafeedURL + this._symbolResolveURL, {
+			//symbol: symbolName ? symbolName.toUpperCase() : ''
 		})
 			.done(function(response) {
-				var data = JSON.parse(response);
+				var data = response;
 				if (data.s && data.s !== 'ok') {
 					onResolveErrorCallback('unknown_symbol');
 				} else {
-					onResultReady(data);
+					//console.log('需要改变的data')
+					//console.log(data)
+					var data = data[0]
+					var description = data.symbol;
+					var has_intraday = true;
+					var has_no_volume = true;
+					var minmov = 1;
+					var minmov2 = 0;
+					var name = data.baseAsset;
+					var pointvalue = 1;
+					var pricescale = 10000;
+					var session = "0000-2359";
+					var supported_resolutions = ['1','5','15'];
+					var ticker  = data.symbol;
+					var timezone = "America/New_York";
+					var type = 'bitcoin';
+					var dataNew  = {
+						description:description,
+						has_intraday:has_intraday,
+						has_no_volume:has_no_volume,
+						minmov:minmov,
+						minmov2:minmov2,
+						name:name,
+						pointvalue:pointvalue,
+						pricescale:pricescale,
+						session:session,
+						supported_resolutions:supported_resolutions,
+						ticker:ticker,
+						timezone:timezone,
+						type:type
+					}
+					onResultReady(dataNew);
 				}
 			})
 			.fail(function(reason) {
@@ -313,66 +338,49 @@ Datafeeds.UDFCompatibleDatafeed.prototype._historyURL = '/quote-marketdata/quote
 
 Datafeeds.UDFCompatibleDatafeed.prototype.getBars = function(symbolInfo, resolution, rangeStartDate, rangeEndDate, onDataCallback, onErrorCallback) {
 	//	timestamp sample: 1399939200
-	console.log(rangeStartDate)
 	if (rangeStartDate > 0 && (rangeStartDate + '').length > 10) {
 		throw new Error(['Got a JS time instead of Unix one.', rangeStartDate, rangeEndDate]);
 	}
-	//console.log(this)
 	//请求后端数据,url,params
 	this._send(this._datafeedURL + this._historyURL, {
-		symbol: "UTCETH1",
+		/*symbol: "UTCETH1",
 		status: resolution,
 		startDate: rangeStartDate,
-		endDate: rangeEndDate
+		endDate: rangeEndDate*/
 	})
 	.done(function(response) {
-		alert('ccc')
-		var data = JSON.parse(response);
-		//console.log(data)
-		var nodata = data.s === 'no_data';
-		if (data.s !== 'ok' && !nodata) {
+		var data = response;
+		var len = data.data.length;
+		console.log(data)
+		var status = data.status;
+		//var nodata = data.s === 'no_data';
+		if (data.s !== '"SUCCESS"') {
 			if (!!onErrorCallback) {
 				onErrorCallback(data.s);
 			}
-
-			return;
+			
 		}
-
 		var bars = [];
-
 		//	data is JSON having format {s: "status" (ok, no_data, error),
 		//  v: [volumes], t: [times], o: [opens], h: [highs], l: [lows], c:[closes], nb: "optional_unixtime_if_no_data"}
-		var barsCount = nodata ? 0 : data.t.length;
-
-		var volumePresent = typeof data.v != 'undefined'; //ture or false
-		var ohlPresent = typeof data.o != 'undefined';//true or false
-		//console.log(barsCount)
-		//console.log(ohlPresent)
-		for (var i = 0; i < barsCount; ++i) {
+		//var barsCount = nodata ? 0 : data.t.length;
+		
+		for (var i = 0; i < len; ++i) {
 			var barValue = {
-				time: data.t[i] * 1000,
-				close: data.c[i]
-			};
-
-			if (ohlPresent) {
-				barValue.open = data.o[i];
-				barValue.high = data.h[i];
-				barValue.low = data.l[i];
-			} else {
-				barValue.open = barValue.high = barValue.low = barValue.close;
+				close : data.data[i].close,
+				high : data.data[i].high,
+				low : data.data[i].low,
+				open : data.data[i].open,
+				time : data.data[i].openDate,
+				volume : data.data[i].volume
 			}
-
-			if (volumePresent) {
-				barValue.volume = data.v[i];
-			}
-			//console.log('最终转换成需要的数据结构')
-			//console.log(barValue)
+			console.log(barValue)
 			bars.push(barValue);
 			//console.log('最终拿来传给tradingview的数据')
 			//console.log(bars)
 		}
-
-		onDataCallback(bars, { noData: nodata, nextTime: data.nb || data.nextTime });
+		console.log(bars)
+		onDataCallback(bars, { noData: nodata });
 	})
 	.fail(function(arg) {
 		console.warn(['getBars(): HTTP error', arg]);
@@ -673,7 +681,7 @@ Datafeeds.DataPulseUpdater = function(datafeed, updateFrequency) {
 			(function(_subscriptionRecord) { // eslint-disable-line
 				that._datafeed.getBars(_subscriptionRecord.symbolInfo, resolution, datesRangeLeft, datesRangeRight, function(bars) {
 					that._requestsPending--;
-
+					console.log(_subscriptionRecord)
 					//	means the subscription was cancelled while waiting for data
 					if (!that._subscribers.hasOwnProperty(listenerGUID)) {
 						return;
