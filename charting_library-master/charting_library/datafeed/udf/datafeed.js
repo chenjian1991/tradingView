@@ -29,7 +29,7 @@ Datafeeds.UDFCompatibleDatafeed = function(datafeedURL, updateFrequency) {
 Datafeeds.UDFCompatibleDatafeed.prototype.defaultConfiguration = function() {
 	return {
 		supports_search: true,
-		supports_group_request: false,
+		supports_group_request: false,//必须是false，才会执行symbols接口
 		supported_resolutions: ['1', '5', '15', '30', '60', '1D', '1W', '1M'],
 		supports_marks: false,
 		supports_timescale_marks: false,
@@ -254,7 +254,7 @@ Datafeeds.UDFCompatibleDatafeed.prototype.searchSymbols = function(searchString,
 	}
 };
 
-Datafeeds.UDFCompatibleDatafeed.prototype._symbolResolveURL = '/spot/util/symbol.list';
+Datafeeds.UDFCompatibleDatafeed.prototype._symbolResolveURL = '/spot/util/symbol.list';//symbols接口
 
 //	BEWARE: this function does not consider symbol's exchange
 Datafeeds.UDFCompatibleDatafeed.prototype.resolveSymbol = function(symbolName, onSymbolResolvedCallback, onResolveErrorCallback) {
@@ -289,8 +289,8 @@ Datafeeds.UDFCompatibleDatafeed.prototype.resolveSymbol = function(symbolName, o
 					//console.log(data)
 					var data = data[0]
 					var description = data.symbol;
-					var has_intraday = true;
-					var has_no_volume = true;
+					var has_intraday = true;//否具有日内（分钟）历史数据
+					var has_no_volume = true;//是否有成交量的数据
 					var minmov = 1;
 					var minmov2 = 0;
 					var name = data.baseAsset;
@@ -298,7 +298,7 @@ Datafeeds.UDFCompatibleDatafeed.prototype.resolveSymbol = function(symbolName, o
 					var pricescale = 10000;
 					var session = "0000-2359";
 					var supported_resolutions = ['1','5','15'];
-					var ticker  = data.symbol;
+					var ticker  =  data.symbol;
 					var timezone = "America/New_York";
 					var type = 'bitcoin';
 					var dataNew  = {
@@ -316,6 +316,7 @@ Datafeeds.UDFCompatibleDatafeed.prototype.resolveSymbol = function(symbolName, o
 						timezone:timezone,
 						type:type
 					}
+					console.log(dataNew)
 					onResultReady(dataNew);
 				}
 			})
@@ -334,7 +335,7 @@ Datafeeds.UDFCompatibleDatafeed.prototype.resolveSymbol = function(symbolName, o
 	}
 };
 
-Datafeeds.UDFCompatibleDatafeed.prototype._historyURL = '/quote-marketdata/quote/historical.timeRange';
+Datafeeds.UDFCompatibleDatafeed.prototype._historyURL = '/quote-marketdata/quote/historical.timeRange';//history接口
 
 Datafeeds.UDFCompatibleDatafeed.prototype.getBars = function(symbolInfo, resolution, rangeStartDate, rangeEndDate, onDataCallback, onErrorCallback) {
 	//	timestamp sample: 1399939200
@@ -351,20 +352,18 @@ Datafeeds.UDFCompatibleDatafeed.prototype.getBars = function(symbolInfo, resolut
 	.done(function(response) {
 		var data = response;
 		var len = data.data.length;
+		console.log('history接口返回的数据')
 		console.log(data)
 		var status = data.status;
-		//var nodata = data.s === 'no_data';
-		if (data.s !== '"SUCCESS"') {
+		var nodata = data.status === 'no_data';
+		if (status !== '"SUCCESS"') {
 			if (!!onErrorCallback) {
 				onErrorCallback(data.s);
 			}
 			
 		}
 		var bars = [];
-		//	data is JSON having format {s: "status" (ok, no_data, error),
-		//  v: [volumes], t: [times], o: [opens], h: [highs], l: [lows], c:[closes], nb: "optional_unixtime_if_no_data"}
-		//var barsCount = nodata ? 0 : data.t.length;
-		
+		//var barsCount = nodata ? 0 : len;
 		for (var i = 0; i < len; ++i) {
 			var barValue = {
 				close : data.data[i].close,
@@ -374,7 +373,7 @@ Datafeeds.UDFCompatibleDatafeed.prototype.getBars = function(symbolInfo, resolut
 				time : data.data[i].openDate,
 				volume : data.data[i].volume
 			}
-			console.log(barValue)
+			//console.log(barValue)
 			bars.push(barValue);
 			//console.log('最终拿来传给tradingview的数据')
 			//console.log(bars)
@@ -451,10 +450,10 @@ Datafeeds.SymbolsStorage = function(datafeed) {
 	this._symbolsInfo = {};
 	this._symbolsList = [];
 
-	//this._requestFullSymbolsList();
+	this._requestFullSymbolsList();
 };
 
-/*Datafeeds.SymbolsStorage.prototype._requestFullSymbolsList = function() {
+Datafeeds.SymbolsStorage.prototype._requestFullSymbolsList = function() {
 	var that = this;
 
 	for (var i = 0; i < this._exchangesList.length; ++i) {
@@ -483,7 +482,7 @@ Datafeeds.SymbolsStorage = function(datafeed) {
 				};
 			})(exchange));
 	}
-};*/
+};
 
 Datafeeds.SymbolsStorage.prototype._onExchangeDataReceived = function(exchangeName, data) {
 	function tableField(data, name, index) {
