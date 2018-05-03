@@ -33,14 +33,14 @@
 					container_id: "tv_chart_container",
 					//	BEWARE: no trailing slash is expected in feed URL
 					// "http://localhost:3030"
-					datafeed: new Datafeeds.UDFCompatibleDatafeed("https://demo_feed.tradingview.com",'1000'),
+					datafeed: new Datafeeds.UDFCompatibleDatafeed("http://test-api.dev.bgaex.com:8080"),
 					library_path: "charting_library/",
 					locale: getParameterByName('lang') || "en",
 					allow_symbol_change: true,
 					//	Regression Trend-related functionality is not implemented yet, so it's hidden for a while
 					drawings_access: { type: 'black', tools: [ { name: "Regression Trend" } ] },
-					disabled_features: ["use_localstorage_for_settings","volume_force_overlay","header_compare","header_symbol_search","header_resolutions","header_undo_redo","header_chart_tpye","header_screenshot","header_chart_type","timeframes_toolbar","display_market_stauts",""],
-					enabled_features: ["study_templates","move_logo_to_main_pane"],
+					disabled_features: ["use_localstorage_for_settings","volume_force_overlay","header_compare","header_symbol_search","header_resolutions","header_undo_redo","header_chart_tpye","header_screenshot","header_chart_type","timeframes_toolbar","display_market_stauts","study_templates"],
+					enabled_features: ["","move_logo_to_main_pane"],
                     charts_storage_api_version: "1.1",
 					client_id: 'tradingview.com',
 					loading_screen: { backgroundColor: "#fff" },

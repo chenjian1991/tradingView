@@ -22,15 +22,18 @@ Datafeeds.UDFCompatibleDatafeed = function(datafeedURL, updateFrequency) {
 	this._callbacks = {};
 
 	this._initialize();
+	this.getBars()//自己添加的方法
+	//this.resolveSymbol()
 };
 
 Datafeeds.UDFCompatibleDatafeed.prototype.defaultConfiguration = function() {
 	return {
-		supports_search: false,
-		supports_group_request: true,
+		supports_search: true,
+		supports_group_request: false,
 		supported_resolutions: ['1', '5', '15', '30', '60', '1D', '1W', '1M'],
 		supports_marks: false,
-		supports_timescale_marks: false
+		supports_timescale_marks: false,
+		support_time:true,
 	};
 };
 
@@ -98,12 +101,10 @@ Datafeeds.UDFCompatibleDatafeed.prototype._send = function(url, params) {
 
 Datafeeds.UDFCompatibleDatafeed.prototype._initialize = function() {
 	var that = this;
-
 	this._send(this._datafeedURL + '/config')
 		.done(function(response) {
 			var configurationData = JSON.parse(response);
-			console.log(configurationData)
-			that._setupWithConfiguration(configurationData);
+			that._setupWithConfigurtion(configurationData);
 		})
 		.fail(function(reason) {
 			that._setupWithConfiguration(that.defaultConfiguration());
@@ -112,6 +113,7 @@ Datafeeds.UDFCompatibleDatafeed.prototype._initialize = function() {
 
 Datafeeds.UDFCompatibleDatafeed.prototype.onReady = function(callback) {
 	var that = this;
+	console.log(that)
 	if (this._configuration) {
 		setTimeout(function() {
 			callback(that._configuration);
@@ -196,7 +198,6 @@ Datafeeds.UDFCompatibleDatafeed.prototype.getTimescaleMarks = function(symbolInf
 
 Datafeeds.UDFCompatibleDatafeed.prototype.searchSymbols = function(searchString, exchange, type, onResultReadyCallback) {
 	var MAX_SEARCH_RESULTS = 30;
-
 	if (!this._configuration) {
 		onResultReadyCallback([]);
 		return;
@@ -253,7 +254,7 @@ Datafeeds.UDFCompatibleDatafeed.prototype.searchSymbols = function(searchString,
 	}
 };
 
-Datafeeds.UDFCompatibleDatafeed.prototype._symbolResolveURL = '/symbols';
+Datafeeds.UDFCompatibleDatafeed.prototype._symbolResolveURL = '/spot/util/symbol.list';
 
 //	BEWARE: this function does not consider symbol's exchange
 Datafeeds.UDFCompatibleDatafeed.prototype.resolveSymbol = function(symbolName, onSymbolResolvedCallback, onResolveErrorCallback) {
@@ -282,12 +283,11 @@ Datafeeds.UDFCompatibleDatafeed.prototype.resolveSymbol = function(symbolName, o
 	}
 
 	if (!this._configuration.supports_group_request) {
-		this._send(this._datafeedURL + this._symbolResolveURL, {
+		this._send("http://test-api.dev.bgaex.com:8080/spot/util/symbol.list", {
 			symbol: symbolName ? symbolName.toUpperCase() : ''
 		})
 			.done(function(response) {
 				var data = JSON.parse(response);
-
 				if (data.s && data.s !== 'ok') {
 					onResolveErrorCallback('unknown_symbol');
 				} else {
@@ -309,22 +309,24 @@ Datafeeds.UDFCompatibleDatafeed.prototype.resolveSymbol = function(symbolName, o
 	}
 };
 
-Datafeeds.UDFCompatibleDatafeed.prototype._historyURL = '/history';
+Datafeeds.UDFCompatibleDatafeed.prototype._historyURL = '/quote-marketdata/quote/historical.timeRange';
 
 Datafeeds.UDFCompatibleDatafeed.prototype.getBars = function(symbolInfo, resolution, rangeStartDate, rangeEndDate, onDataCallback, onErrorCallback) {
 	//	timestamp sample: 1399939200
+	console.log(rangeStartDate)
 	if (rangeStartDate > 0 && (rangeStartDate + '').length > 10) {
 		throw new Error(['Got a JS time instead of Unix one.', rangeStartDate, rangeEndDate]);
 	}
 	//console.log(this)
 	//请求后端数据,url,params
 	this._send(this._datafeedURL + this._historyURL, {
-		symbol: symbolInfo.ticker.toUpperCase(),
-		resolution: resolution,
-		from: rangeStartDate,
-		to: rangeEndDate
+		symbol: "UTCETH1",
+		status: resolution,
+		startDate: rangeStartDate,
+		endDate: rangeEndDate
 	})
 	.done(function(response) {
+		alert('ccc')
 		var data = JSON.parse(response);
 		//console.log(data)
 		var nodata = data.s === 'no_data';
@@ -434,17 +436,17 @@ Datafeeds.UDFCompatibleDatafeed.prototype.unsubscribeQuotes = function(listenerG
 Datafeeds.SymbolsStorage = function(datafeed) {
 	this._datafeed = datafeed;
 
-	this._exchangesList = ['NYSE', 'FOREX', 'AMEX'];
+	//this._exchangesList = ['NYSE', 'FOREX', 'AMEX'];
 	this._exchangesWaitingForData = {};
 	this._exchangesDataCache = {};
 
 	this._symbolsInfo = {};
 	this._symbolsList = [];
 
-	this._requestFullSymbolsList();
+	//this._requestFullSymbolsList();
 };
 
-Datafeeds.SymbolsStorage.prototype._requestFullSymbolsList = function() {
+/*Datafeeds.SymbolsStorage.prototype._requestFullSymbolsList = function() {
 	var that = this;
 
 	for (var i = 0; i < this._exchangesList.length; ++i) {
@@ -473,7 +475,7 @@ Datafeeds.SymbolsStorage.prototype._requestFullSymbolsList = function() {
 				};
 			})(exchange));
 	}
-};
+};*/
 
 Datafeeds.SymbolsStorage.prototype._onExchangeDataReceived = function(exchangeName, data) {
 	function tableField(data, name, index) {
