@@ -22,8 +22,6 @@ Datafeeds.UDFCompatibleDatafeed = function(datafeedURL, updateFrequency) {
 	this._callbacks = {};
 
 	this._initialize();
-	this.getBars()//自己添加的方法
-	//this.resolveSymbol()
 };
 
 Datafeeds.UDFCompatibleDatafeed.prototype.defaultConfiguration = function() {
@@ -290,14 +288,14 @@ Datafeeds.UDFCompatibleDatafeed.prototype.resolveSymbol = function(symbolName, o
 					var data = data[0]
 					var description = data.symbol;
 					var has_intraday = true;//否具有日内（分钟）历史数据
-					var has_no_volume = true;//是否有成交量的数据
+					var has_no_volume = false;//是否有成交量的数据
 					var minmov = 1;
 					var minmov2 = 0;
 					var name = data.baseAsset;
 					var pointvalue = 1;
 					var pricescale = 10000;
 					var session = "0000-2359";
-					var supported_resolutions = ['1','5','15'];
+					var supported_resolutions = ['1', '5', '15', '30', '60', '1D', '1W', '1M'];
 					var ticker  =  data.symbol;
 					var timezone = "America/New_York";
 					var type = 'bitcoin';
@@ -363,7 +361,6 @@ Datafeeds.UDFCompatibleDatafeed.prototype.getBars = function(symbolInfo, resolut
 			
 		}
 		var bars = [];
-		//var barsCount = nodata ? 0 : len;
 		for (var i = 0; i < len; ++i) {
 			var barValue = {
 				close : data.data[i].close,
@@ -373,13 +370,11 @@ Datafeeds.UDFCompatibleDatafeed.prototype.getBars = function(symbolInfo, resolut
 				time : data.data[i].openDate,
 				volume : data.data[i].volume
 			}
-			//console.log(barValue)
 			bars.push(barValue);
-			//console.log('最终拿来传给tradingview的数据')
-			//console.log(bars)
 		}
+
 		console.log(bars)
-		onDataCallback(bars, { noData: nodata });
+		onDataCallback(bars, { noData: nodata, nextTime: data.nb || data.nextTime });
 	})
 	.fail(function(arg) {
 		console.warn(['getBars(): HTTP error', arg]);
