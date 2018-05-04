@@ -27,10 +27,14 @@
 			TradingView.onready(function()
 			{
 				var widget = window.tvWidget = new TradingView.widget({
-					fullscreen: true,
-					symbol: 'AAPL',
-					interval: 'D',
+					//debug:true,
+					fullscreen: false,
+					symbol: this.symbol,
+					interval: '1',
 					container_id: "tv_chart_container",
+					width:'800px',
+					autosize:false,
+					//preset: "mobile",
 					//	BEWARE: no trailing slash is expected in feed URL
 					// "http://localhost:3030"
 					datafeed: new Datafeeds.UDFCompatibleDatafeed("http://test-api.dev.bgaex.com:8080",'10000'),
@@ -39,7 +43,7 @@
 					allow_symbol_change: true,
 					//	Regression Trend-related functionality is not implemented yet, so it's hidden for a while
 					drawings_access: { type: 'black', tools: [ { name: "Regression Trend" } ] },
-					disabled_features: ["use_localstorage_for_settings","volume_force_overlay","header_compare","header_symbol_search","header_resolutions","header_undo_redo","header_chart_tpye","header_screenshot","header_chart_type","timeframes_toolbar","display_market_stauts","study_templates"],
+					disabled_features: ["use_localstorage_for_settings","volume_force_overlay","header_compare","header_symbol_search",/*"header_resolutions"*/,"header_undo_redo","header_chart_tpye","header_screenshot","header_chart_type","timeframes_toolbar","display_market_stauts","study_templates"],
 					enabled_features: ["","move_logo_to_main_pane"],
                     charts_storage_api_version: "1.1",
 					client_id: 'tradingview.com',
@@ -91,6 +95,10 @@
 
                 	},
                 	custom_css_url :"./myself.css",
+					favorites: {
+				        chartTypes: ["Area", "Line"]
+				    }
+
 				});
 				//分时的样式
 				widget.onChartReady(function() {
@@ -106,17 +114,28 @@
                 ];
                 for(var i=0; i<resolution.length; i++){
                     widget.createButton({align:"left"})
-                        .attr('title', resolution[i]['text'])
+                        .attr('title', resolution[i]['resolution'])
                         .html(resolution[i]['text'])
                         .on('click', function (e) {
-                            // do something
+                            var num = $(this).attr('title');
                             console.log(this)
+                            $(this).addClass('minutecheckedStyle').parent().siblings().find('.button').removeClass('minutecheckedStyle')
+                            console.log(num)
+                            //widget.chart().setChartType(num)
+                            widget.chart().setResolution(num,function(){
+
+                            })
+                           
                         })
                 }
 					var length_arr = [5, 10, 30,60];
 					length_arr.forEach(function(val, index){
 						widget.chart().createStudy('Moving Average', false, false, [val]);
 					})
+
+
+
+
 
             });
 

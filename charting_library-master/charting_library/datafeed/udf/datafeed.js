@@ -284,38 +284,34 @@ Datafeeds.UDFCompatibleDatafeed.prototype.resolveSymbol = function(symbolName, o
 					onResolveErrorCallback('unknown_symbol');
 				} else {
 					//console.log('需要改变的data')
-					//console.log(data)
-					var data = data[0]
-					var description = data.symbol;
-					var has_intraday = true;//否具有日内（分钟）历史数据
-					var has_no_volume = false;//是否有成交量的数据
-					var minmov = 1;
-					var minmov2 = 0;
-					var name = data.baseAsset;
-					var pointvalue = 1;
-					var pricescale = 10000;
-					var session = "0000-2359";
-					var supported_resolutions = ['1', '5', '15', '30', '60', '1D', '1W', '1M'];
-					var ticker  =  data.symbol;
-					var timezone = "America/New_York";
-					var type = 'bitcoin';
-					var dataNew  = {
-						description:description,
-						has_intraday:has_intraday,
-						has_no_volume:has_no_volume,
-						minmov:minmov,
-						minmov2:minmov2,
-						name:name,
-						pointvalue:pointvalue,
-						pricescale:pricescale,
-						session:session,
-						supported_resolutions:supported_resolutions,
-						ticker:ticker,
-						timezone:timezone,
-						type:type
+					console.log('symbol接口返回数据')
+					console.log(data)
+					var symbolsArray = [];
+					var len = data.length;
+					for(var i=0;i<len;i++){
+						var dataNew = {
+							 description : data[i].symbol,
+							 has_intraday : true,//否具有日内（分钟）历史数据
+							 has_no_volume : false,//是否有成交量的数据
+							 minmov : 1,
+							 minmov2 : 0,
+							 name : data[i].baseAsset,
+							 pointvalue : 1,
+							 pricescale : 8,
+							 session : "0000-2359",
+							 supported_resolutions : ['1', '5', '15', '30', '60', '1D', '1W', '1M'],
+							 ticker  :  data[i].symbol,
+							 timezone : "America/New_York",
+							 type : 'bitcoin'
+						}
+						 symbolsArray.push(dataNew)
+
 					}
+					
+					console.log('转换后的symbols')
+					//console.log(symbolsArray)
 					console.log(dataNew)
-					onResultReady(dataNew);
+					onResultReady(symbolsArray[2]);
 				}
 			})
 			.fail(function(reason) {
@@ -342,16 +338,14 @@ Datafeeds.UDFCompatibleDatafeed.prototype.getBars = function(symbolInfo, resolut
 	}
 	//请求后端数据,url,params
 	this._send(this._datafeedURL + this._historyURL, {
-		/*symbol: "UTCETH1",
-		status: resolution,
-		startDate: rangeStartDate,
-		endDate: rangeEndDate*/
+		//symbol:symbolInfo.ticker.toUpperCase(),
+		resolution: resolution,
+		//startDate: rangeStartDate,
+		//endDate: rangeEndDate
 	})
 	.done(function(response) {
 		var data = response;
 		var len = data.data.length;
-		console.log('history接口返回的数据')
-		console.log(data)
 		var status = data.status;
 		var nodata = data.status === 'no_data';
 		if (status !== '"SUCCESS"') {
@@ -372,7 +366,7 @@ Datafeeds.UDFCompatibleDatafeed.prototype.getBars = function(symbolInfo, resolut
 			}
 			bars.push(barValue);
 		}
-
+		console.log('history接口返回的数据')
 		console.log(bars)
 		onDataCallback(bars, { noData: nodata, nextTime: data.nb || data.nextTime });
 	})
@@ -481,9 +475,8 @@ Datafeeds.SymbolsStorage.prototype._requestFullSymbolsList = function() {
 
 Datafeeds.SymbolsStorage.prototype._onExchangeDataReceived = function(exchangeName, data) {
 	function tableField(data, name, index) {
-		return data[name] instanceof Array ?
-			data[name][index] :
-			data[name];
+		console.log(data)
+		return data[name] instanceof Array ? data[name][index] :data[name];
 	}
 
 	try	{
@@ -684,7 +677,7 @@ Datafeeds.DataPulseUpdater = function(datafeed, updateFrequency) {
 					if (bars.length === 0) {
 						return;
 					}
-
+					
 					var lastBar = bars[bars.length - 1];
 					if (!isNaN(_subscriptionRecord.lastBarTime) && lastBar.time < _subscriptionRecord.lastBarTime) {
 						return;
