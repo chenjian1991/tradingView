@@ -334,8 +334,9 @@ Datafeeds.UDFCompatibleDatafeed.prototype.resolveSymbol = function(symbolName, o
 	}
 };
 
-Datafeeds.UDFCompatibleDatafeed.prototype._historyURL = '/quote-marketdata/quote/summarized.timeRange';//history接口
 
+
+Datafeeds.UDFCompatibleDatafeed.prototype._historyURL="/quote-marketdata/quote/summarized.timeRange";//history接口
 Datafeeds.UDFCompatibleDatafeed.prototype.getBars = function(symbolInfo, resolution, rangeStartDate, rangeEndDate, onDataCallback, onErrorCallback) {
 	//	timestamp sample: 1399939200
 	if (rangeStartDate > 0 && (rangeStartDate + '').length > 10) {
@@ -347,10 +348,10 @@ Datafeeds.UDFCompatibleDatafeed.prototype.getBars = function(symbolInfo, resolut
 		console.log(day_seconds)
 	//请求后端数据,url,params
 	this._send(this._datafeedURL + this._historyURL, {
-		/*symbol:symbolInfo.ticker.toUpperCase(),
+		symbol:symbolInfo.ticker.toUpperCase(),
 		resolution: resolution,
 		from: rangeStartDate,
-		to: rangeEndDate */
+		to: rangeEndDate 
 	})
 	.done(function(response) {
 		var data = response;

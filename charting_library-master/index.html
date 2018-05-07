@@ -86,6 +86,7 @@
 				//分时的样式
 				widget.onChartReady(function() {
                 var resolution = [
+                	{"text":'分时', "resolution":'-1'},
                     {"text":'1min', "resolution":'1'},
                     {"text":'5min', "resolution":'5'},
                     {"text":'15min', "resolution":'15'},
@@ -97,22 +98,24 @@
                 ];
                 for(var i=0; i<resolution.length; i++){
                     widget.createButton({align:"left"})
-                        .attr('title', resolution[i]['resolution'])
+                        .attr({'title': resolution[i]['resolution'],"value":i})
                         .html(resolution[i]['text'])
                         .on('click', function (e) {
                             var num = $(this).attr('title');
-                            console.log(this)
+                            var value = $(this).attr('value')
                             $(this).addClass('minutecheckedStyle').parent().siblings().find('.button').removeClass('minutecheckedStyle')
-                            console.log(num)
-                            //widget.chart().setChartType(num)
-                            widget.chart().setResolution(num,function(){
-                            	if(num<=60){
-                            	alert('分钟')
-                            	Datafeeds.UDFCompatibleDatafeed.prototype._historyURL="/quote-marketdata/quote/summarized.timeRange";
-                            }else if(num =='1D'){
-                            	alert('日')
+                            
+                             if(value==0){
+                            	 widget.chart().setChartType(3)//默认是分钟数
+                             }
+                            if(value>=6){
                             	Datafeeds.UDFCompatibleDatafeed.prototype._historyURL="/quote-marketdata/quote/historical.timeRange";
                             }
+                            if(value<=5){
+                            	Datafeeds.UDFCompatibleDatafeed.prototype._historyURL="/quote-marketdata/quote/summarized.timeRange";
+                            }
+                            widget.chart().setResolution(num,function(){
+                            	
                             })
                             
 
@@ -120,6 +123,7 @@
                            
                         })
                 }
+
 					var length_arr = [5, 10, 30,60];
 					length_arr.forEach(function(val, index){
 						widget.chart().createStudy('Moving Average', false, false, [val]);
