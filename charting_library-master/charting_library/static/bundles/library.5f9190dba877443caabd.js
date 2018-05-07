@@ -70031,6 +70031,8 @@ function(t, e, i) {
                 var i, o;
                 this._checkBars(t),
                 this._alignBarsTime(t),
+                console.log('t-t')
+                console.log(t)
                 t.length > 0 ? (i = t[0].time, o = t[t.length - 1].time, this._logMessage("Receiving bars: total {0} bars in [{1} ... {2}] ".format(t.length, a(i), a(o))), i < 1e3 * this._leftDate && this._logMessage("Returned more data than needed"), this._putToCache(t) ? this._cache.bars.length && this._leftDate > this._cache.bars[0].time / 1e3 && (this._leftDate = this._cache.bars[0].time / 1e3) : this._logMessage("Incremental update failed. Starting full update.", !0), e && e.nextTime ? console.warn("nextTime should be set when there is no data in the requested period only") : e && e.noData && console.warn("noData should be set when there is no data in the requested period and earlier only")) : (this._logMessage("Receiving bars: barset is empty"), e && e.nextTime ? (this._logMessage("Next time received: `{0}`".format(a(1e3 * e.nextTime))), this._addGap(e.nextTime), this._leftDate = Math.min(this._leftDate || this._now() / 1e3, e.nextTime + 1)) : e && e.noData && (this._logMessage("EOD received"), this._endOfData = !0, this._cache.bars.length && (this._leftDate = this._cache.bars[0].time / 1e3))),
                 this._processNextPendingSubscriber()
             }

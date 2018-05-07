@@ -20,8 +20,9 @@ Datafeeds.UDFCompatibleDatafeed = function(datafeedURL, updateFrequency) {
 	this._enableLogging = false;
 	this._initializationFinished = false;
 	this._callbacks = {};
-
+	console.log("STEP _initialize") 
 	this._initialize();
+	
 };
 
 Datafeeds.UDFCompatibleDatafeed.prototype.defaultConfiguration = function() {
@@ -98,13 +99,16 @@ Datafeeds.UDFCompatibleDatafeed.prototype._send = function(url, params) {
 };
 
 Datafeeds.UDFCompatibleDatafeed.prototype._initialize = function() {
+	
 	var that = this;
 	this._send(this._datafeedURL + '/config')
 		.done(function(response) {
 			var configurationData = JSON.parse(response);
 			that._setupWithConfigurtion(configurationData);
+
 		})
 		.fail(function(reason) {
+			console.log('step:aaaaa')
 			that._setupWithConfiguration(that.defaultConfiguration());
 		});
 };
@@ -271,7 +275,7 @@ Datafeeds.UDFCompatibleDatafeed.prototype.resolveSymbol = function(symbolName, o
 		if (that.postProcessSymbolInfo) {
 			postProcessedData = that.postProcessSymbolInfo(postProcessedData);
 		}
-		that._logMessage('Symbol resolved: ' + (Date.now() - resolveRequestStartTime));
+		//that._logMessage('Symbol resolved: ' + (Date.now() - resolveRequestStartTime));
 		onSymbolResolvedCallback(postProcessedData);
 	}
 	if (!this._configuration.supports_group_request) {
@@ -285,7 +289,6 @@ Datafeeds.UDFCompatibleDatafeed.prototype.resolveSymbol = function(symbolName, o
 				} else {
 					//console.log('需要改变的data')
 					console.log('symbol接口返回数据')
-					console.log(data)
 					var symbolsArray = [];
 					var len = data.length;
 					for(var i=0;i<len;i++){
@@ -297,21 +300,23 @@ Datafeeds.UDFCompatibleDatafeed.prototype.resolveSymbol = function(symbolName, o
 							 minmov2 : 0,
 							 name : data[i].baseAsset,
 							 pointvalue : 1,
-							 pricescale : 8,
+							 pricescale : 100000,
 							 session : "0000-2359",
 							 supported_resolutions : ['1', '5', '15', '30', '60', '1D', '1W', '1M'],
 							 ticker  :  data[i].symbol,
 							 timezone : "America/New_York",
-							 type : 'bitcoin'
+							 type : 'bitcoin',
+							/* expired:true,
+							 expiration_date:'1355693040'*/
 						}
 						 symbolsArray.push(dataNew)
 
 					}
 					
 					console.log('转换后的symbols')
-					//console.log(symbolsArray)
-					console.log(dataNew)
-					onResultReady(symbolsArray[2]);
+					console.log(symbolsArray[0])
+					//console.log(dataNew)
+					onResultReady(symbolsArray[0]);
 				}
 			})
 			.fail(function(reason) {
@@ -329,46 +334,52 @@ Datafeeds.UDFCompatibleDatafeed.prototype.resolveSymbol = function(symbolName, o
 	}
 };
 
-Datafeeds.UDFCompatibleDatafeed.prototype._historyURL = '/quote-marketdata/quote/historical.timeRange';//history接口
+Datafeeds.UDFCompatibleDatafeed.prototype._historyURL = '/quote-marketdata/quote/summarized.timeRange';//history接口
 
 Datafeeds.UDFCompatibleDatafeed.prototype.getBars = function(symbolInfo, resolution, rangeStartDate, rangeEndDate, onDataCallback, onErrorCallback) {
 	//	timestamp sample: 1399939200
 	if (rangeStartDate > 0 && (rangeStartDate + '').length > 10) {
 		throw new Error(['Got a JS time instead of Unix one.', rangeStartDate, rangeEndDate]);
 	}
+	console.log('step:getBars')
 	//请求后端数据,url,params
 	this._send(this._datafeedURL + this._historyURL, {
-		//symbol:symbolInfo.ticker.toUpperCase(),
+		symbol:symbolInfo.ticker.toUpperCase(),
 		resolution: resolution,
-		//startDate: rangeStartDate,
-		//endDate: rangeEndDate
+		from: rangeStartDate,
+		to: rangeEndDate 
 	})
 	.done(function(response) {
 		var data = response;
+		console.log('原始history')
+		console.log(data)
 		var len = data.data.length;
 		var status = data.status;
 		var nodata = data.status === 'no_data';
-		if (status !== '"SUCCESS"') {
+		console.log('aaaaaaaaaaaaa')
+		if (status !== 'SUCCESS') {//引号让人崩溃，多了一层引号"'SUCCESS'"
 			if (!!onErrorCallback) {
-				onErrorCallback(data.s);
+				onErrorCallback(data.status);
 			}
 			
 		}
+		console.log('bbbbbbbbbbbb')
 		var bars = [];
 		for (var i = 0; i < len; ++i) {
 			var barValue = {
 				close : data.data[i].close,
 				high : data.data[i].high,
+				isBarClosed:true,
 				low : data.data[i].low,
 				open : data.data[i].open,
-				time : data.data[i].openDate,
+				time : data.data[i].openDateTime,
 				volume : data.data[i].volume
 			}
 			bars.push(barValue);
 		}
 		console.log('history接口返回的数据')
 		console.log(bars)
-		onDataCallback(bars, { noData: nodata, nextTime: data.nb || data.nextTime });
+		onDataCallback(bars);
 	})
 	.fail(function(arg) {
 		console.warn(['getBars(): HTTP error', arg]);
@@ -492,7 +503,7 @@ Datafeeds.SymbolsStorage.prototype._onExchangeDataReceived = function(exchangeNa
 			var hasIntraday = tableField(data, 'has-intraday', symbolIndex);
 
 			var tickerPresent = typeof data.ticker != 'undefined';
-
+console.log('step:_onExchangeDataReceived')
 			var symbolInfo = {
 				name: symbolName,
 				base_name: [listedExchange + ':' + symbolName],
@@ -644,31 +655,33 @@ Datafeeds.SymbolSearchComponent.prototype.searchSymbols = function(searchArgumen
 Datafeeds.DataPulseUpdater = function(datafeed, updateFrequency) {
 	this._datafeed = datafeed;
 	this._subscribers = {};
-
 	this._requestsPending = 0;
 	var that = this;
-
 	var update = function() {
 		if (that._requestsPending > 0) {
 			return;
 		}
-
+		console.log('step DataPulseUpdater')
+		console.log('this._subscribers')
+		console.log(that._subscribers)
 		for (var listenerGUID in that._subscribers) {
 			var subscriptionRecord = that._subscribers[listenerGUID];
+			console.log('subscriptionRecord')
+			console.log(subscriptionRecord)
 			var resolution = subscriptionRecord.resolution;
-
 			var datesRangeRight = parseInt((new Date().valueOf()) / 1000);
-
+			//var datesRangeRight =  '1355567520'
 			//	BEWARE: please note we really need 2 bars, not the only last one
 			//	see the explanation below. `10` is the `large enough` value to work around holidays
 			var datesRangeLeft = datesRangeRight - that.periodLengthSeconds(resolution, 10);
-
+			//var datesRangeLeft = '1355567040'
 			that._requestsPending++;
 
 			(function(_subscriptionRecord) { // eslint-disable-line
 				that._datafeed.getBars(_subscriptionRecord.symbolInfo, resolution, datesRangeLeft, datesRangeRight, function(bars) {
 					that._requestsPending--;
-					console.log(_subscriptionRecord)
+					console.log('bars')
+					console.log(bars)
 					//	means the subscription was cancelled while waiting for data
 					if (!that._subscribers.hasOwnProperty(listenerGUID)) {
 						return;
@@ -677,8 +690,11 @@ Datafeeds.DataPulseUpdater = function(datafeed, updateFrequency) {
 					if (bars.length === 0) {
 						return;
 					}
-					
 					var lastBar = bars[bars.length - 1];
+					console.log("lastBar.time")
+					console.log(lastBar.time)
+					console.log(_subscriptionRecord.lastBarTime)
+
 					if (!isNaN(_subscriptionRecord.lastBarTime) && lastBar.time < _subscriptionRecord.lastBarTime) {
 						return;
 					}
@@ -744,8 +760,9 @@ Datafeeds.DataPulseUpdater.prototype.subscribeDataListener = function(symbolInfo
 
 Datafeeds.DataPulseUpdater.prototype.periodLengthSeconds = function(resolution, requiredPeriodsCount) {
 	var daysCount = 0;
-
-	if (resolution === 'D') {
+	if(resolution === '1'){
+			daysCount = requiredPeriodsCount/1440;
+	}else if (resolution === 'D') {
 		daysCount = requiredPeriodsCount;
 	} else if (resolution === 'M') {
 		daysCount = 31 * requiredPeriodsCount;
@@ -754,6 +771,7 @@ Datafeeds.DataPulseUpdater.prototype.periodLengthSeconds = function(resolution, 
 	} else {
 		daysCount = requiredPeriodsCount * resolution / (24 * 60);
 	}
+	
 
 	return daysCount * 24 * 60 * 60;
 };
@@ -796,7 +814,7 @@ Datafeeds.QuotesPulseUpdater.prototype._updateQuotes = function(symbolsGetter) {
 	if (this._requestsPending > 0) {
 		return;
 	}
-
+console.log("step _updateQuotes")
 	var that = this;
 	for (var listenerGUID in this._subscribers) {
 		this._requestsPending++;

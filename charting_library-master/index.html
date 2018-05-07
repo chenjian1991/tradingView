@@ -27,7 +27,7 @@
 			TradingView.onready(function()
 			{
 				var widget = window.tvWidget = new TradingView.widget({
-					//debug:true,
+					debug:true,
 					fullscreen: false,
 					symbol: this.symbol,
 					interval: '1',
@@ -39,7 +39,7 @@
 					// "http://localhost:3030"
 					datafeed: new Datafeeds.UDFCompatibleDatafeed("http://test-api.dev.bgaex.com:8080",'10000'),
 					library_path: "charting_library/",
-					locale: getParameterByName('lang') || "en",
+					locale: getParameterByName('lang') || "zh",
 					allow_symbol_change: true,
 					//	Regression Trend-related functionality is not implemented yet, so it's hidden for a while
 					drawings_access: { type: 'black', tools: [ { name: "Regression Trend" } ] },
@@ -80,7 +80,7 @@
 					"mainSeriesProperties.candleStyle.wickDownColor": 'rgba( 115, 115, 117, 1)',
 					"mainSeriesProperties.candleStyle.barColorsOnPrevClose": false,
 */
-		            linetoolicon: {
+		           /* linetoolicon: {
 						   " singleChartOnly": true,
 						    "color": 'rgba( 61, 133, 198, 1)',
 						    "snapTo45Degrees":true,
@@ -91,7 +91,7 @@
 						},
 						linetoolthumbup: {
 							    color: 'rgba( 0, 128, 0, 1)'
-						},
+						},*/
 
                 	},
                 	custom_css_url :"./myself.css",
