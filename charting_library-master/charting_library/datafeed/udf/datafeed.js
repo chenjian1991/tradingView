@@ -22,7 +22,7 @@ Datafeeds.UDFCompatibleDatafeed = function(datafeedURL, updateFrequency) {
 	this._callbacks = {};
 	console.log("STEP _initialize") 
 	this._initialize();
-	
+	//this.getBars()
 };
 
 Datafeeds.UDFCompatibleDatafeed.prototype.defaultConfiguration = function() {
@@ -341,13 +341,16 @@ Datafeeds.UDFCompatibleDatafeed.prototype.getBars = function(symbolInfo, resolut
 	if (rangeStartDate > 0 && (rangeStartDate + '').length > 10) {
 		throw new Error(['Got a JS time instead of Unix one.', rangeStartDate, rangeEndDate]);
 	}
-	console.log('step:getBars')
+		console.log('this.this._historyURL')
+		console.log(this._historyURL)
+		var day_seconds = this._historyURL.indexOf('summarized');
+		console.log(day_seconds)
 	//请求后端数据,url,params
 	this._send(this._datafeedURL + this._historyURL, {
-		symbol:symbolInfo.ticker.toUpperCase(),
+		/*symbol:symbolInfo.ticker.toUpperCase(),
 		resolution: resolution,
 		from: rangeStartDate,
-		to: rangeEndDate 
+		to: rangeEndDate */
 	})
 	.done(function(response) {
 		var data = response;
@@ -356,15 +359,14 @@ Datafeeds.UDFCompatibleDatafeed.prototype.getBars = function(symbolInfo, resolut
 		var len = data.data.length;
 		var status = data.status;
 		var nodata = data.status === 'no_data';
-		console.log('aaaaaaaaaaaaa')
 		if (status !== 'SUCCESS') {//引号让人崩溃，多了一层引号"'SUCCESS'"
 			if (!!onErrorCallback) {
 				onErrorCallback(data.status);
 			}
 			
 		}
-		console.log('bbbbbbbbbbbb')
 		var bars = [];
+	
 		for (var i = 0; i < len; ++i) {
 			var barValue = {
 				close : data.data[i].close,
@@ -372,11 +374,19 @@ Datafeeds.UDFCompatibleDatafeed.prototype.getBars = function(symbolInfo, resolut
 				isBarClosed:true,
 				low : data.data[i].low,
 				open : data.data[i].open,
-				time : data.data[i].openDateTime,
+				//time : data.data[i].openDateTime,
 				volume : data.data[i].volume
+			}
+			if(day_seconds!==-1){
+					barValue.time = data.data[i].openDateTime;
+			}else{
+				barValue.time = data.data[i].openDate;
 			}
 			bars.push(barValue);
 		}
+
+
+
 		console.log('history接口返回的数据')
 		console.log(bars)
 		onDataCallback(bars);

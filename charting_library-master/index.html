@@ -43,7 +43,7 @@
 					allow_symbol_change: true,
 					//	Regression Trend-related functionality is not implemented yet, so it's hidden for a while
 					drawings_access: { type: 'black', tools: [ { name: "Regression Trend" } ] },
-					disabled_features: ["use_localstorage_for_settings","volume_force_overlay","header_compare","header_symbol_search",/*"header_resolutions"*/,"header_undo_redo","header_chart_tpye","header_screenshot","header_chart_type","timeframes_toolbar","display_market_stauts","study_templates"],
+					disabled_features: ["use_localstorage_for_settings","volume_force_overlay","header_compare","header_symbol_search","header_resolutions","header_undo_redo","header_chart_tpye","header_screenshot","header_chart_type","timeframes_toolbar","display_market_stauts","study_templates"],
 					enabled_features: ["","move_logo_to_main_pane"],
                     charts_storage_api_version: "1.1",
 					client_id: 'tradingview.com',
@@ -76,23 +76,6 @@
 					"mainSeriesProperties.candleStyle.borderColor": "#589065",
 					"mainSeriesProperties.candleStyle.borderUpColor": "#589065",
 					"mainSeriesProperties.candleStyle.borderDownColor": "#ae4e54",
-					/*"mainSeriesProperties.candleStyle.wickUpColor": 'rgba( 115, 115, 117, 1)',
-					"mainSeriesProperties.candleStyle.wickDownColor": 'rgba( 115, 115, 117, 1)',
-					"mainSeriesProperties.candleStyle.barColorsOnPrevClose": false,
-*/
-		           /* linetoolicon: {
-						   " singleChartOnly": true,
-						    "color": 'rgba( 61, 133, 198, 1)',
-						    "snapTo45Degrees":true,
-						   " size": 40,
-						    "icon": 0x263A,
-						    "angle": Math.PI * 0.5,
-						    "scale": 1.0
-						},
-						linetoolthumbup: {
-							    color: 'rgba( 0, 128, 0, 1)'
-						},*/
-
                 	},
                 	custom_css_url :"./myself.css",
 					favorites: {
@@ -123,8 +106,17 @@
                             console.log(num)
                             //widget.chart().setChartType(num)
                             widget.chart().setResolution(num,function(){
-
+                            	if(num<=60){
+                            	alert('分钟')
+                            	Datafeeds.UDFCompatibleDatafeed.prototype._historyURL="/quote-marketdata/quote/summarized.timeRange";
+                            }else if(num =='1D'){
+                            	alert('日')
+                            	Datafeeds.UDFCompatibleDatafeed.prototype._historyURL="/quote-marketdata/quote/historical.timeRange";
+                            }
                             })
+                            
+
+
                            
                         })
                 }
