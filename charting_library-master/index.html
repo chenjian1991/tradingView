@@ -43,7 +43,7 @@
 					allow_symbol_change: true,
 					//	Regression Trend-related functionality is not implemented yet, so it's hidden for a while
 					drawings_access: { type: 'black', tools: [ { name: "Regression Trend" } ] },
-					disabled_features: ["use_localstorage_for_settings","volume_force_overlay","header_compare","header_symbol_search","header_resolutions","header_undo_redo","header_chart_tpye","header_screenshot","header_chart_type","timeframes_toolbar","display_market_stauts","study_templates"],
+					disabled_features: ["use_localstorage_for_settings","volume_force_overlay","header_compare","header_symbol_search","header_resolutions","header_undo_redo","header_chart_tpye","header_screenshot","header_chart_type","timeframes_toolbar","display_market_stauts","study_templates",'left_toolbar'],
 					enabled_features: ["","move_logo_to_main_pane"],
                     charts_storage_api_version: "1.1",
 					client_id: 'tradingview.com',
@@ -76,7 +76,17 @@
 					"mainSeriesProperties.candleStyle.borderColor": "#589065",
 					"mainSeriesProperties.candleStyle.borderUpColor": "#589065",
 					"mainSeriesProperties.candleStyle.borderDownColor": "#ae4e54",
+
+					"mainSeriesProperties.areaStyle.color1": "rgba(0, 0, 0, 0.1)",
+					"mainSeriesProperties.areaStyle.color2": "rgba(0, 0, 0, 0.1)",
+					"mainSeriesProperties.areaStyle.linecolor": "#fff",
+					"mainSeriesProperties.areaStyle.linestyle":0,
+					"mainSeriesProperties.areaStyle.linewidth": 1,
+					"mainSeriesProperties.areaStyle.priceSource": "close"
                 	},
+                	studies_overrides: {
+					    
+					},
                 	custom_css_url :"./myself.css",
 					favorites: {
 				        chartTypes: ["Area", "Line"]
@@ -106,7 +116,9 @@
                             $(this).addClass('minutecheckedStyle').parent().siblings().find('.button').removeClass('minutecheckedStyle')
                             
                              if(value==0){
-                            	 widget.chart().setChartType(3)//默认是分钟数
+                            	 widget.chart().setChartType(3)//
+                             }else{
+                            	 widget.chart().setChartType(1)//
                              }
                             if(value>=6){
                             	Datafeeds.UDFCompatibleDatafeed.prototype._historyURL="/quote-marketdata/quote/historical.timeRange";
