@@ -116,9 +116,9 @@
                             $(this).addClass('minutecheckedStyle').parent().siblings().find('.button').removeClass('minutecheckedStyle')
                             
                              if(value==0){
-                            	 widget.chart().setChartType(3)//
+                            	 widget.chart().setChartType(3)//分时图
                              }else{
-                            	 widget.chart().setChartType(1)//
+                            	 widget.chart().setChartType(1)//k线图
                              }
                             if(value>=6){
                             	Datafeeds.UDFCompatibleDatafeed.prototype._historyURL="/quote-marketdata/quote/historical.timeRange";
