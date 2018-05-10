@@ -351,7 +351,7 @@ Datafeeds.UDFCompatibleDatafeed.prototype.getBars = function(symbolInfo, resolut
 		symbol:symbolInfo.ticker.toUpperCase(),
 		resolution: resolution,
 		from: rangeStartDate,
-		to: rangeEndDate 
+		to: rangeEndDate
 	})
 	.done(function(response) {
 		var data = response;
