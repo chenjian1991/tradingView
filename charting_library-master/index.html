@@ -28,7 +28,7 @@
 			{
 				var widget = window.tvWidget = new TradingView.widget({
 					debug:true,
-					fullscreen: false,
+					fullscreen: true,
 					symbol: this.symbol,
 					interval: '1',
 					container_id: "tv_chart_container",
@@ -49,10 +49,10 @@
 					user_id: 'public_user_id',
 					overrides: {
                     "symbolWatermarkProperties.color": "rgba(0, 0, 0, 0)",
-                    "mainSeriesProperties.barStyle.upColor": "#6ba583",
-                    "mainSeriesProperties.barStyle.downColor": "black",
+                   /* "mainSeriesProperties.barStyle.upColor": "#589065",
+                    "mainSeriesProperties.barStyle.downColor": "#589065",
                     "mainSeriesProperties.barStyle.barColorsOnPrevClose": false,
-                    "mainSeriesProperties.barStyle.dontDrawOpen": false,
+                    "mainSeriesProperties.barStyle.dontDrawOpen": false,*/
                     "volumePaneSize": "medium",//成交量大小的显示
                     
 					//背景色，蜡烛颜色
@@ -73,10 +73,13 @@
 					"mainSeriesProperties.candleStyle.borderColor": "#589065",
 					"mainSeriesProperties.candleStyle.borderUpColor": "#589065",
 					"mainSeriesProperties.candleStyle.borderDownColor": "#ae4e54",
+					"mainSeriesProperties.candleStyle.wickUpColor": '#589065',//控制影线的颜色
+					"mainSeriesProperties.candleStyle.wickDownColor": '#ae4e54',
+					"mainSeriesProperties.candleStyle.barColorsOnPrevClose": false,
 
-					"mainSeriesProperties.areaStyle.color1": "rgba(0, 0, 0, 0.1)",
-					"mainSeriesProperties.areaStyle.color2": "rgba(0, 0, 0, 0.1)",
-					"mainSeriesProperties.areaStyle.linecolor": "#fff",
+					"mainSeriesProperties.areaStyle.color1": "rgba(255,255,255,0.1)",
+					"mainSeriesProperties.areaStyle.color2": "rgba(255,255,255,0.1)",
+					"mainSeriesProperties.areaStyle.linecolor": "#4e5b85",
 					"mainSeriesProperties.areaStyle.linestyle":0,
 					"mainSeriesProperties.areaStyle.linewidth": 1,
 					"mainSeriesProperties.areaStyle.priceSource": "close"
@@ -122,7 +125,7 @@
                             	Datafeeds.UDFCompatibleDatafeed.prototype._historyURL="/quote-marketdata/quote/historical.timeRange";
                             }
                             if(value<=5){
-                            	Datafeeds.UDFCompatibleDatafeed.prototype._historyURL="/quote-marketdata/quote/summarized.timeRange";
+                            	Datafeeds.UDFCompatibleDatafeed.prototype._historyURL="/quote-summarized/quote/summarized.timeRange";
                             }
                             if(num!=0){
                             	widget.chart().setResolution(num,function(){
@@ -130,10 +133,6 @@
                             })
 
                             }
-                            
-                            
-
-
                            
                         })
                 }

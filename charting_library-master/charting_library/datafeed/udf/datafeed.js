@@ -40,6 +40,7 @@ Datafeeds.UDFCompatibleDatafeed.prototype.getServerTime = function(callback) {
 	if (this._configuration.supports_time) {
 		this._send(this._datafeedURL + '/time', {})
 			.done(function(response) {
+				alert(response)
 				callback(+response);
 			})
 			.fail(function() {
@@ -301,13 +302,11 @@ Datafeeds.UDFCompatibleDatafeed.prototype.resolveSymbol = function(symbolName, o
 							 name : data[i].baseAsset,
 							 pointvalue : 1,
 							 pricescale : 100000,
-							 session : "0000-2359",
+							 session : "24x7",
 							 supported_resolutions : ['1', '5', '15', '30', '60', '1D', '1W', '1M'],
 							 ticker  :  data[i].symbol,
-							 timezone : "America/New_York",
+							// timezone : "Asia/Hong_Kong",
 							 type : 'bitcoin',
-							/* expired:true,
-							 expiration_date:'1355693040'*/
 						}
 						 symbolsArray.push(dataNew)
 
@@ -316,7 +315,7 @@ Datafeeds.UDFCompatibleDatafeed.prototype.resolveSymbol = function(symbolName, o
 					console.log('转换后的symbols')
 					console.log(symbolsArray[0])
 					//console.log(dataNew)
-					onResultReady(symbolsArray[0]);
+					onResultReady(symbolsArray[3]);
 				}
 			})
 			.fail(function(reason) {
@@ -336,7 +335,7 @@ Datafeeds.UDFCompatibleDatafeed.prototype.resolveSymbol = function(symbolName, o
 
 
 
-Datafeeds.UDFCompatibleDatafeed.prototype._historyURL="/quote-marketdata/quote/summarized.timeRange";//history接口
+Datafeeds.UDFCompatibleDatafeed.prototype._historyURL="/quote-summarized/quote/summarized.timeRange";//history接口
 Datafeeds.UDFCompatibleDatafeed.prototype.getBars = function(symbolInfo, resolution, rangeStartDate, rangeEndDate, onDataCallback, onErrorCallback) {
 	//	timestamp sample: 1399939200
 	if (rangeStartDate > 0 && (rangeStartDate + '').length > 10) {
@@ -349,14 +348,14 @@ Datafeeds.UDFCompatibleDatafeed.prototype.getBars = function(symbolInfo, resolut
 	//请求后端数据,url,params
 	this._send(this._datafeedURL + this._historyURL, {
 		symbol:symbolInfo.ticker.toUpperCase(),
-		resolution: resolution,
-		from: rangeStartDate,
-		to: rangeEndDate
+		status: 'MINUTE_'+resolution,
+		startDateTime: rangeStartDate*1000,		
+		endDateTime: rangeEndDate*1000
 	})
 	.done(function(response) {
 		var data = response;
 		console.log('原始history')
-		console.log(data)
+		//console.log(data)
 		var len = data.data.length;
 		var status = data.status;
 		var nodata = data.status === 'no_data';
@@ -367,7 +366,6 @@ Datafeeds.UDFCompatibleDatafeed.prototype.getBars = function(symbolInfo, resolut
 			
 		}
 		var bars = [];
-	
 		for (var i = 0; i < len; ++i) {
 			var barValue = {
 				close : data.data[i].close,
@@ -383,18 +381,31 @@ Datafeeds.UDFCompatibleDatafeed.prototype.getBars = function(symbolInfo, resolut
 			}else{
 				barValue.time = data.data[i].openDate;
 			}
+			//console.log(barValue)
+
 			bars.push(barValue);
 		}
 
 
-
-		console.log('history接口返回的数据')
-		console.log(bars)
-		onDataCallback(bars);
+		var compare = function(obj1,obj2){
+				var val1  = obj1.time;
+				var val2  = obj2.time;
+				if(val1<val2){
+					return -1;
+				}else if(val1>val2){
+					return 1;
+				}
+			}
+			
+			console.log('处理后的history')
+			console.log(bars)
+			var completeBars = bars.sort(compare)
+			console.log('倒叙排列后')
+			console.log(bars.sort(compare))
+			onDataCallback(completeBars);
 	})
 	.fail(function(arg) {
 		console.warn(['getBars(): HTTP error', arg]);
-
 		if (!!onErrorCallback) {
 			onErrorCallback('network error: ' + JSON.stringify(arg));
 		}
@@ -680,6 +691,7 @@ Datafeeds.DataPulseUpdater = function(datafeed, updateFrequency) {
 			console.log('subscriptionRecord')
 			console.log(subscriptionRecord)
 			var resolution = subscriptionRecord.resolution;
+
 			var datesRangeRight = parseInt((new Date().valueOf()) / 1000);
 			//var datesRangeRight =  '1355567520'
 			//	BEWARE: please note we really need 2 bars, not the only last one
