@@ -35,17 +35,17 @@
 					width:'800px',
 					autosize:false,
 					timeframe:'3D',
-					datafeed: new Datafeeds.UDFCompatibleDatafeed("http://test-api.dev.bgaex.com:8080",'10000'),
+					datafeed: new Datafeeds.UDFCompatibleDatafeed("http://test-api.dev.bgaex.com:8080",'1000'),
 					library_path: "charting_library/",
 					locale: getParameterByName('lang') || "zh",
 					allow_symbol_change: true,
 					drawings_access: { type: 'black', tools: [ { name: "Regression Trend" } ] },
-					disabled_features: ["use_localstorage_for_settings","volume_force_overlay","header_compare","header_symbol_search","header_resolutions","header_undo_redo","header_chart_tpye","header_screenshot","header_chart_type","timeframes_toolbar","display_market_stauts","study_templates",'left_toolbar',],
+					disabled_features: ["use_localstorage_for_settings","volume_force_overlay","header_compare","header_symbol_search","header_resolutions","header_undo_redo","header_chart_tpye","header_screenshot","header_chart_type","timeframes_toolbar","display_market_stauts","study_templates",'left_toolbar'],
 					enabled_features: ["dont_show_boolean_study_arguments","move_logo_to_main_pane","hide_last_na_study_output","legend_context_menu"],
                     charts_storage_api_version: "1.1",
 					client_id: 'tradingview.com',
 					loading_screen: { backgroundColor: "#fff" },
-					timezone:'Asia/Tokyo',
+					timezone:'Asia/Shanghai',
 					user_id: 'public_user_id',
 					overrides: {
                     "symbolWatermarkProperties.color": "rgba(0, 0, 0, 0)",
@@ -114,8 +114,6 @@
                             var num = $(this).attr('title');
                             var value = $(this).attr('value')
                             $(this).addClass('minutecheckedStyle').parent().siblings().find('.button').removeClass('minutecheckedStyle')
-                            
-
                              if(value==0){
                             	 widget.chart().setChartType(3)//分时图
                              }else{

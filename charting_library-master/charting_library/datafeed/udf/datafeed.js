@@ -305,7 +305,7 @@ Datafeeds.UDFCompatibleDatafeed.prototype.resolveSymbol = function(symbolName, o
 							 session : "24x7",
 							 supported_resolutions : ['1', '5', '15', '30', '60', '1D', '1W', '1M'],
 							 ticker  :  data[i].symbol,
-							// timezone : "Asia/Hong_Kong",
+							timezone : "Asia/Shanghai",
 							 type : 'bitcoin',
 						}
 						 symbolsArray.push(dataNew)
@@ -349,23 +349,27 @@ Datafeeds.UDFCompatibleDatafeed.prototype.getBars = function(symbolInfo, resolut
 	this._send(this._datafeedURL + this._historyURL, {
 		symbol:symbolInfo.ticker.toUpperCase(),
 		status: 'MINUTE_'+resolution,
-		startDateTime: rangeStartDate*1000,		
+		startDateTime: rangeStartDate*1000,
 		endDateTime: rangeEndDate*1000
 	})
 	.done(function(response) {
 		var data = response;
 		console.log('原始history')
 		//console.log(data)
-		var len = data.data.length;
+		//var len = data.data.length;
 		var status = data.status;
-		var nodata = data.status === 'no_data';
-		if (status !== 'SUCCESS') {//引号让人崩溃，多了一层引号"'SUCCESS'"
+		if(status=="ERROR"){
+
+		}
+		var nodata = data.status === 'ERROR';  //error就是nodata
+	/*	if (status !== 'SUCCESS') {//引号让人崩溃，多了一层引号"'SUCCESS'"
 			if (!!onErrorCallback) {
 				onErrorCallback(data.status);
 			}
 			
-		}
+		}*/
 		var bars = [];
+		var len = nodata ? 0 : data.data.length;
 		for (var i = 0; i < len; ++i) {
 			var barValue = {
 				close : data.data[i].close,
@@ -373,7 +377,6 @@ Datafeeds.UDFCompatibleDatafeed.prototype.getBars = function(symbolInfo, resolut
 				isBarClosed:true,
 				low : data.data[i].low,
 				open : data.data[i].open,
-				//time : data.data[i].openDateTime,
 				volume : data.data[i].volume
 			}
 			if(day_seconds!==-1){
@@ -381,8 +384,6 @@ Datafeeds.UDFCompatibleDatafeed.prototype.getBars = function(symbolInfo, resolut
 			}else{
 				barValue.time = data.data[i].openDate;
 			}
-			//console.log(barValue)
-
 			bars.push(barValue);
 		}
 
@@ -402,7 +403,7 @@ Datafeeds.UDFCompatibleDatafeed.prototype.getBars = function(symbolInfo, resolut
 			var completeBars = bars.sort(compare)
 			console.log('倒叙排列后')
 			console.log(bars.sort(compare))
-			onDataCallback(completeBars);
+			onDataCallback(completeBars,{noData:nodata});
 	})
 	.fail(function(arg) {
 		console.warn(['getBars(): HTTP error', arg]);
